@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { PokemonListPage } from './screens/PokemonListPage';
+import { PokemonDetailModal } from './screens/PokemonDetailModal';
 import { LayoutWrapper } from './LayoutWrapper';
 import { ApolloProvider } from '@apollo/client/react';
 import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client';
@@ -19,7 +20,24 @@ const App = () => (
       <Routes>
         <Route path="/" element={<LayoutWrapper />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/list" element={<PokemonListPage />} />
+          <Route
+            path="/list"
+            element={
+              <>
+                <PokemonListPage />
+                <PokemonDetailModal />
+              </>
+            }
+          />
+          <Route
+            path="/pokemon/:id"
+            element={
+              <>
+                <PokemonListPage />
+                <PokemonDetailModal />
+              </>
+            }
+          />
         </Route>
       </Routes>
     </BrowserRouter>
