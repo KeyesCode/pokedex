@@ -154,6 +154,12 @@ const useStyles = tss.create(({ theme }) => ({
     color: theme.color.text.primary,
     padding: '24px',
     minHeight: '100%',
+    '@media (max-width: 768px)': {
+      padding: '16px',
+    },
+    '@media (max-width: 480px)': {
+      padding: '12px',
+    },
   },
   loadingContainer: {
     display: 'flex',
@@ -176,12 +182,29 @@ const useStyles = tss.create(({ theme }) => ({
     gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
     gap: '16px',
     marginBottom: '32px',
+    '@media (max-width: 768px)': {
+      gridTemplateColumns: '1fr',
+      gap: '12px',
+      marginBottom: '24px',
+    },
+    '@media (max-width: 480px)': {
+      gap: '10px',
+      marginBottom: '20px',
+    },
   },
   paginationContainer: {
     display: 'flex',
     justifyContent: 'center',
     marginTop: '32px',
     padding: '24px 0',
+    '@media (max-width: 768px)': {
+      marginTop: '24px',
+      padding: '16px 0',
+    },
+    '@media (max-width: 480px)': {
+      marginTop: '20px',
+      padding: '12px 0',
+    },
   },
   paginationWrapper: {
     display: 'flex',
@@ -198,6 +221,50 @@ const useStyles = tss.create(({ theme }) => ({
     justifyContent: 'center',
   },
   pagination: {
+    '@media (max-width: 768px)': {
+      '& .ant-pagination-item': {
+        minWidth: '32px',
+        height: '32px',
+        lineHeight: '32px',
+        fontSize: '14px',
+      },
+      '& .ant-pagination-prev, & .ant-pagination-next': {
+        minWidth: '32px',
+        height: '32px',
+        '& .ant-pagination-item-link': {
+          minWidth: '32px',
+          height: '32px',
+          lineHeight: '30px',
+        },
+      },
+    },
+    '@media (max-width: 480px)': {
+      '& .ant-pagination-item': {
+        minWidth: '28px',
+        height: '28px',
+        lineHeight: '28px',
+        fontSize: '12px',
+        marginRight: '4px',
+      },
+      '& .ant-pagination-prev, & .ant-pagination-next': {
+        minWidth: '28px',
+        height: '28px',
+        '& .ant-pagination-item-link': {
+          minWidth: '28px',
+          height: '28px',
+          lineHeight: '26px',
+        },
+      },
+      '& .ant-pagination-jump-prev, & .ant-pagination-jump-next': {
+        minWidth: '28px',
+        height: '28px',
+        '& .ant-pagination-item-link': {
+          minWidth: '28px',
+          height: '28px',
+          lineHeight: '26px',
+        },
+      },
+    },
     '& .ant-pagination-item': {
       backgroundColor: '#1a1a2e',
       borderColor: '#2a2a4e',
@@ -311,6 +378,9 @@ const useStyles = tss.create(({ theme }) => ({
       color: theme.color.text.primary,
       fontSize: '14px',
       fontWeight: 500,
+      '@media (max-width: 480px)': {
+        fontSize: '12px',
+      },
     },
   },
 }));

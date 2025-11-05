@@ -68,6 +68,16 @@ const useStyles = tss.create(({ theme }) => ({
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
     transition: 'transform 0.1s ease-out',
     cursor: 'pointer',
+    '@media (max-width: 768px)': {
+      width: '150px',
+      height: '150px',
+      padding: '12px',
+    },
+    '@media (max-width: 480px)': {
+      width: '120px',
+      height: '120px',
+      padding: '10px',
+    },
   },
   image: {
     width: '100%',

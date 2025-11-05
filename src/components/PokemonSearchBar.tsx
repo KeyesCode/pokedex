@@ -35,6 +35,13 @@ const useStyles = tss.create(() => ({
   searchContainer: {
     marginBottom: '24px',
     maxWidth: '500px',
+    width: '100%',
+    '@media (max-width: 768px)': {
+      marginBottom: '20px',
+    },
+    '@media (max-width: 480px)': {
+      marginBottom: '16px',
+    },
   },
   searchInput: {
     backgroundColor: '#ffffff',

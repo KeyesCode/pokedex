@@ -49,11 +49,19 @@ const useStyles = tss.create(({ theme }) => ({
     marginBottom: '16px',
     textAlign: 'center',
     letterSpacing: '0.5px',
+    '@media (max-width: 480px)': {
+      fontSize: '18px',
+      marginBottom: '12px',
+    },
   },
   statsGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, 1fr)',
     gap: '12px',
+    '@media (max-width: 480px)': {
+      gridTemplateColumns: '1fr',
+      gap: '10px',
+    },
   },
   statCard: {
     backgroundColor: '#0f0f1e',

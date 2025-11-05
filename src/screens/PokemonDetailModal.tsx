@@ -85,6 +85,18 @@ export const PokemonDetailModal = () => {
 
 const useStyles = tss.create(({ theme }) => ({
   modal: {
+    '& .ant-modal': {
+      '@media (max-width: 768px)': {
+        maxWidth: '95vw !important',
+        margin: '10px auto !important',
+      },
+      '@media (max-width: 480px)': {
+        maxWidth: '100vw !important',
+        margin: '0 !important',
+        top: '0 !important',
+        paddingBottom: '0 !important',
+      },
+    },
     '& .ant-modal-content': {
       backgroundColor: '#1a1a2e',
       color: theme.color.text.primary,
@@ -101,6 +113,12 @@ const useStyles = tss.create(({ theme }) => ({
       right: '16px',
       transition: 'all 0.2s ease',
       cursor: 'pointer',
+      '@media (max-width: 480px)': {
+        top: '12px',
+        right: '12px',
+        width: '28px',
+        height: '28px',
+      },
       '&:hover': {
         backgroundColor: '#4a90e2',
         transform: 'scale(1.1)',
@@ -112,6 +130,12 @@ const useStyles = tss.create(({ theme }) => ({
         color: '#FAFAFA',
         fontSize: '16px',
         fontWeight: 600,
+        '@media (max-width: 480px)': {
+          width: '28px',
+          height: '28px',
+          lineHeight: '28px',
+          fontSize: '14px',
+        },
       },
     },
   },
@@ -130,5 +154,9 @@ const useStyles = tss.create(({ theme }) => ({
     alignItems: 'center',
     marginBottom: '20px',
     gap: '12px',
+    '@media (max-width: 480px)': {
+      marginBottom: '16px',
+      gap: '8px',
+    },
   },
 }));

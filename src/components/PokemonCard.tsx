@@ -52,6 +52,10 @@ const useStyles = tss.create(({ theme }) => ({
     textAlign: 'left',
     fontFamily: 'inherit',
     fontSize: 'inherit',
+    '@media (max-width: 480px)': {
+      padding: '12px',
+      gap: '12px',
+    },
     '&:hover': {
       transform: 'translateY(-4px)',
       boxShadow: '0 8px 16px rgba(0, 0, 0, 0.3)',
@@ -72,6 +76,10 @@ const useStyles = tss.create(({ theme }) => ({
     justifyContent: 'center',
     backgroundColor: '#0f0f1e',
     borderRadius: '8px',
+    '@media (max-width: 480px)': {
+      width: '60px',
+      height: '60px',
+    },
   },
   image: {
     width: '100%',
@@ -98,11 +106,17 @@ const useStyles = tss.create(({ theme }) => ({
     fontSize: '18px',
     fontWeight: 600,
     color: theme.color.text.primary,
+    '@media (max-width: 480px)': {
+      fontSize: '16px',
+    },
   },
   number: {
     fontSize: '14px',
     color: '#888',
     fontWeight: 500,
+    '@media (max-width: 480px)': {
+      fontSize: '12px',
+    },
   },
   typesContainer: {
     display: 'flex',

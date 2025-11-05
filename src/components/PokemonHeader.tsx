@@ -45,11 +45,23 @@ const useStyles = tss.create(({ theme }) => ({
     margin: 0,
     textTransform: 'capitalize',
     letterSpacing: '0.5px',
+    '@media (max-width: 768px)': {
+      fontSize: '24px',
+    },
+    '@media (max-width: 480px)': {
+      fontSize: '20px',
+    },
   },
   number: {
     fontSize: '18px',
     color: '#888',
     fontWeight: 600,
+    '@media (max-width: 768px)': {
+      fontSize: '16px',
+    },
+    '@media (max-width: 480px)': {
+      fontSize: '14px',
+    },
   },
   typesContainer: {
     display: 'flex',

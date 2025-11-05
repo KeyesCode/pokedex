@@ -21,16 +21,29 @@ export const LayoutWrapper = () => {
 
   return (
     <Layout className={classes.rootLayout}>
-      <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+      <Sider
+        collapsible
+        collapsed={collapsed}
+        onCollapse={(value) => setCollapsed(value)}
+        breakpoint="lg"
+        collapsedWidth={80}
+        className={classes.sider}
+      >
         <Menu
           theme="dark"
           mode="inline"
           items={menuItems}
           selectedKeys={[location.pathname]}
-          onClick={(e) => navigate(e.key)}
+          onClick={(e) => {
+            navigate(e.key);
+            // Auto-collapse sidebar on mobile after navigation
+            if (window.innerWidth < 992) {
+              setCollapsed(true);
+            }
+          }}
         />
       </Sider>
-      <Content>
+      <Content className={classes.content}>
         <Outlet />
       </Content>
     </Layout>
@@ -45,6 +58,34 @@ const useStyles = tss.create(({ theme }) => ({
     '& main': {
       padding: 16,
       overflowY: 'auto',
+      '@media (max-width: 768px)': {
+        padding: '12px',
+      },
+      '@media (max-width: 480px)': {
+        padding: '8px',
+      },
+    },
+  },
+  sider: {
+    '@media (max-width: 992px)': {
+      position: 'fixed',
+      left: 0,
+      top: 0,
+      bottom: 0,
+      zIndex: 100,
+      '&.ant-layout-sider-collapsed': {
+        width: '80px !important',
+        minWidth: '80px !important',
+        maxWidth: '80px !important',
+      },
+    },
+  },
+  content: {
+    '@media (max-width: 992px)': {
+      marginLeft: '80px !important',
+    },
+    '@media (max-width: 480px)': {
+      marginLeft: '0 !important',
     },
   },
 }));

@@ -42,6 +42,13 @@ const useStyles = tss.create(({ theme }) => ({
     display: 'grid',
     gridTemplateColumns: 'repeat(3, 1fr)',
     gap: '12px',
+    '@media (max-width: 768px)': {
+      gap: '8px',
+    },
+    '@media (max-width: 480px)': {
+      gridTemplateColumns: '1fr',
+      gap: '8px',
+    },
   },
   infoCard: {
     backgroundColor: '#0f0f1e',
@@ -51,6 +58,9 @@ const useStyles = tss.create(({ theme }) => ({
     border: '1px solid #2a2a4e',
     transition: 'all 0.2s ease',
     cursor: 'pointer',
+    '@media (max-width: 480px)': {
+      padding: '12px',
+    },
     '&:hover': {
       borderColor: '#4a90e2',
       transform: 'translateY(-2px)',
