@@ -40,7 +40,7 @@ export const GET_POKEMONS = gql`
 `;
 
 export const GET_POKEMON_DETAILS = gql`
-  query GetPokemonDetails($id: String!) {
+  query GetPokemonDetails($id: Int!) {
     pokemon(where: { id: { _eq: $id } }) {
       id
       pokemonspecy {
@@ -103,12 +103,14 @@ export const useGetPokemonDetails = (
   loading: boolean;
   error: useQuery.Result['error'];
 } => {
+  const idInt = id ? parseInt(id, 10) : null;
+  const isValidId = idInt !== null && !Number.isNaN(idInt);
   const { data, loading, error } = useQuery<{ pokemon: any[] }>(GET_POKEMON_DETAILS, {
-    variables: { id },
-    skip: !id,
+    variables: { id: idInt },
+    skip: !isValidId,
   });
 
-  if (!id || !data?.pokemon?.[0]) {
+  if (!isValidId || !data?.pokemon?.[0]) {
     return { data: null, loading, error };
   }
 
