@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Spin, Empty } from 'antd';
+import { Spin } from 'antd';
 import { tss } from '../tss';
 import { useGetPokemons, Pokemon } from 'src/hooks/useGetPokemons';
 import { PokemonCard } from '../components/PokemonCard';
 import { PokemonSearchBar } from '../components/PokemonSearchBar';
+import { PokemonEmptyState } from '../components/PokemonEmptyState';
 
 export const PokemonListPage = () => {
   const { classes } = useStyles();
@@ -58,9 +59,7 @@ export const PokemonListPage = () => {
       />
 
       {filteredData.length === 0 ? (
-        <div className={classes.emptyContainer}>
-          <Empty description="No Pokémon found" />
-        </div>
+        <PokemonEmptyState searchTerm={searchTerm} />
       ) : (
         <ul className={classes.list}>
           {filteredData.map((pokemon) => (
@@ -90,12 +89,6 @@ const useStyles = tss.create(({ theme }) => ({
     alignItems: 'center',
     minHeight: '400px',
     color: '#ff4d4f',
-  },
-  emptyContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '400px',
   },
   list: {
     listStyle: 'none',

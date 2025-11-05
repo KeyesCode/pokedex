@@ -83,4 +83,69 @@ describe('PokemonListPage', () => {
     expect(screen.getByText('Ivysaur')).toBeInTheDocument();
     expect(screen.getByText('Pikachu')).toBeInTheDocument();
   });
+
+  test('search is case insensitive', async () => {
+    const { getByPlaceholderText, queryByText, user } = render(
+      <MemoryRouter>
+        <PokemonListPage />
+      </MemoryRouter>,
+    );
+
+    const searchInput = getByPlaceholderText('Search Pokémon by name, number, or type...');
+
+    // Search with uppercase - should find lowercase matches
+    await act(async () => {
+      await user.type(searchInput, 'BULBASAUR');
+    });
+
+    expect(screen.getByText('Bulbasaur')).toBeInTheDocument();
+    expect(queryByText('Pikachu')).not.toBeInTheDocument();
+
+    // Clear and search with mixed case
+    await act(async () => {
+      await user.clear(searchInput);
+      await user.type(searchInput, 'PiKaChU');
+    });
+
+    expect(screen.getByText('Pikachu')).toBeInTheDocument();
+    expect(queryByText('Bulbasaur')).not.toBeInTheDocument();
+  });
+
+  test('search by type is case insensitive', async () => {
+    const { getByPlaceholderText, queryByText, user } = render(
+      <MemoryRouter>
+        <PokemonListPage />
+      </MemoryRouter>,
+    );
+
+    const searchInput = getByPlaceholderText('Search Pokémon by name, number, or type...');
+
+    // Search for type with uppercase
+    await act(async () => {
+      await user.type(searchInput, 'GRASS');
+    });
+
+    // Should find both Bulbasaur and Ivysaur (both have grass type)
+    expect(screen.getByText('Bulbasaur')).toBeInTheDocument();
+    expect(screen.getByText('Ivysaur')).toBeInTheDocument();
+    expect(queryByText('Pikachu')).not.toBeInTheDocument();
+  });
+
+  test('search by number works', async () => {
+    const { getByPlaceholderText, queryByText, user } = render(
+      <MemoryRouter>
+        <PokemonListPage />
+      </MemoryRouter>,
+    );
+
+    const searchInput = getByPlaceholderText('Search Pokémon by name, number, or type...');
+
+    // Search by number
+    await act(async () => {
+      await user.type(searchInput, '25');
+    });
+
+    expect(screen.getByText('Pikachu')).toBeInTheDocument();
+    expect(queryByText('Bulbasaur')).not.toBeInTheDocument();
+  });
 });
