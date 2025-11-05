@@ -21,7 +21,11 @@ export const PokemonDetailModal = () => {
   const { data, loading, error } = useGetPokemonDetails(id);
 
   const handleClose = () => {
-    navigate('/list');
+    // Preserve pagination state from URL when closing
+    const searchParams = new URLSearchParams(location.search);
+    const pageParam = searchParams.get('page');
+    const url = pageParam ? `/list?page=${pageParam}` : '/list';
+    navigate(url);
   };
 
   return (

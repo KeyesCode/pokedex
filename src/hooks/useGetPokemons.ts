@@ -17,8 +17,8 @@ export interface PokemonDetail extends Pokemon {
 }
 
 export const GET_POKEMONS = gql`
-  query GetPokemons {
-    pokemon(limit: 151, order_by: { id: asc }) {
+  query GetPokemons($limit: Int, $offset: Int) {
+    pokemon(limit: $limit, offset: $offset, order_by: { id: asc }) {
       id
       pokemonspecy {
         pokemonspeciesnames(where: { language: { name: { _eq: "en" } } }) {
@@ -71,13 +71,22 @@ export const GET_POKEMON_DETAILS = gql`
   }
 `;
 
-// Search should be done client-side for the mid-level assessment. Uncomment for the senior assessment.
-export const useGetPokemons = (/* search?: string */): {
+export const useGetPokemons = (
+  page: number = 1,
+  pageSize: number = 20,
+  fetchAll: boolean = false,
+): {
   data: Pokemon[];
   loading: boolean;
   error: useQuery.Result['error'];
+  totalCount: number;
 } => {
-  const { data, loading, error } = useQuery<{ pokemon: any[] }>(GET_POKEMONS);
+  const limit = fetchAll ? 160 : pageSize;
+  const offset = fetchAll ? 0 : (page - 1) * pageSize;
+
+  const { data, loading, error } = useQuery<{ pokemon: any[] }>(GET_POKEMONS, {
+    variables: { limit, offset },
+  });
 
   return {
     data:
@@ -93,6 +102,7 @@ export const useGetPokemons = (/* search?: string */): {
       ) ?? [],
     loading,
     error,
+    totalCount: 160, // Total number of Pokémon
   };
 };
 

@@ -22,6 +22,7 @@ describe('PokemonListPage', () => {
       ],
       loading: false,
       error: undefined,
+      totalCount: 160,
     });
   });
 
