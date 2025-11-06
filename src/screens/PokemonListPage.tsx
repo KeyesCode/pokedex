@@ -130,7 +130,15 @@ export const PokemonListPage = () => {
   const paginatedData = needsAllData
     ? filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
     : displayData;
-  const paginationTotal = needsAllData ? filteredData.length : totalCount;
+  // Use totalCount as fallback during loading to keep pagination visible
+  let paginationTotal: number;
+  if (needsAllData) {
+    // When searching/filtering, use filtered length, but fallback to totalCount during loading
+    paginationTotal = loading && filteredData.length === 0 ? totalCount : filteredData.length;
+  } else {
+    // Normal pagination always uses totalCount
+    paginationTotal = totalCount;
+  }
 
   if (error) {
     return (
@@ -169,26 +177,26 @@ export const PokemonListPage = () => {
         <PokemonEmptyState searchTerm={typeFilter ? `type: ${typeFilter}` : debouncedSearch} />
       )}
       {!loading && displayData.length > 0 && (
-        <>
-          <ul className={classes.list}>
-            {paginatedData.map((pokemon) => (
-              <PokemonCard
-                key={pokemon.id}
-                pokemon={pokemon}
-                onClick={handlePokemonClick}
-                onMouseEnter={() => handlePokemonHover(pokemon)}
-                onFocus={() => handlePokemonHover(pokemon)}
-                onTypeClick={handleTypeClick}
-              />
-            ))}
-          </ul>
-          <PokemonPagination
-            currentPage={currentPage}
-            total={paginationTotal}
-            pageSize={PAGE_SIZE}
-            onChange={handlePageChange}
-          />
-        </>
+        <ul className={classes.list}>
+          {paginatedData.map((pokemon) => (
+            <PokemonCard
+              key={pokemon.id}
+              pokemon={pokemon}
+              onClick={handlePokemonClick}
+              onMouseEnter={() => handlePokemonHover(pokemon)}
+              onFocus={() => handlePokemonHover(pokemon)}
+              onTypeClick={handleTypeClick}
+            />
+          ))}
+        </ul>
+      )}
+      {paginationTotal > 0 && (
+        <PokemonPagination
+          currentPage={currentPage}
+          total={paginationTotal}
+          pageSize={PAGE_SIZE}
+          onChange={handlePageChange}
+        />
       )}
     </div>
   );
