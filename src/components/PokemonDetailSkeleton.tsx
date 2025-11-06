@@ -8,7 +8,9 @@ export const PokemonDetailSkeleton: React.FC = () => {
   return (
     <div className={classes.content}>
       <div className={classes.header}>
-        <Skeleton.Image active className={classes.skeletonImage} />
+        <div className={classes.skeletonImageContainer}>
+          <Skeleton.Image active className={classes.skeletonImage} />
+        </div>
         <div className={classes.skeletonHeader}>
           <Skeleton.Input active size="large" className={classes.skeletonName} />
           <Skeleton.Input active size="small" className={classes.skeletonNumber} />
@@ -61,17 +63,30 @@ const useStyles = tss.create(() => ({
       gap: '8px',
     },
   },
-  skeletonImage: {
+  skeletonImageContainer: {
     width: '180px',
     height: '180px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#0f0f1e',
+    borderRadius: '12px',
+    padding: '16px',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
     '@media (max-width: 768px)': {
       width: '150px',
       height: '150px',
+      padding: '12px',
     },
     '@media (max-width: 480px)': {
       width: '120px',
       height: '120px',
+      padding: '10px',
     },
+  },
+  skeletonImage: {
+    width: '100%',
+    height: '100%',
   },
   skeletonHeader: {
     display: 'flex',
