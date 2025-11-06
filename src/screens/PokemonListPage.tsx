@@ -1,12 +1,12 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Skeleton } from 'antd';
 import { tss } from '../tss';
 import { useGetPokemons, Pokemon, GET_POKEMON_DETAILS } from 'src/hooks/useGetPokemons';
 import { PokemonCard } from '../components/PokemonCard';
 import { PokemonSearchBar } from '../components/PokemonSearchBar';
 import { PokemonEmptyState } from '../components/PokemonEmptyState';
 import { PokemonPagination } from '../components/PokemonPagination';
+import { PokemonListSkeleton } from '../components/PokemonListSkeleton';
 import { useApolloClient } from '@apollo/client/react';
 
 const PAGE_SIZE = 20;
@@ -120,18 +120,6 @@ export const PokemonListPage = () => {
     : displayData;
   const paginationTotal = hasSearch ? filteredData.length : totalCount;
 
-  // Generate skeleton cards for loading state
-  const skeletonCards = Array.from({ length: PAGE_SIZE }, (_, i) => (
-    <li key={`skeleton-${i}`}>
-      <div className={classes.skeletonCard}>
-        <Skeleton.Image active className={classes.skeletonImage} />
-        <div className={classes.skeletonContent}>
-          <Skeleton active paragraph={{ rows: 2 }} />
-        </div>
-      </div>
-    </li>
-  ));
-
   if (error) {
     return (
       <div className={classes.root}>
@@ -150,7 +138,11 @@ export const PokemonListPage = () => {
         placeholder="Search Pokémon by name, number, or type..."
       />
 
-      {loading && <ul className={classes.list}>{skeletonCards}</ul>}
+      {loading && (
+        <ul className={classes.list}>
+          <PokemonListSkeleton count={PAGE_SIZE} />
+        </ul>
+      )}
       {!loading && displayData.length === 0 && <PokemonEmptyState searchTerm={searchTerm} />}
       {!loading && displayData.length > 0 && (
         <>
@@ -187,31 +179,6 @@ const useStyles = tss.create(({ theme }) => ({
     '@media (max-width: 480px)': {
       padding: '12px',
     },
-  },
-  skeletonCard: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: '12px',
-    padding: '16px',
-    display: 'flex',
-    gap: '16px',
-    alignItems: 'center',
-    border: '1px solid transparent',
-    '@media (max-width: 480px)': {
-      padding: '12px',
-      gap: '12px',
-    },
-  },
-  skeletonImage: {
-    width: '80px',
-    height: '80px',
-    flexShrink: 0,
-    '@media (max-width: 480px)': {
-      width: '60px',
-      height: '60px',
-    },
-  },
-  skeletonContent: {
-    flex: 1,
   },
   errorContainer: {
     display: 'flex',

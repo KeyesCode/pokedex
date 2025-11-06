@@ -1,8 +1,10 @@
 export { PokemonCard } from './PokemonCard';
+export { PokemonDetailSkeleton } from './PokemonDetailSkeleton';
 export { PokemonEmptyState } from './PokemonEmptyState';
 export { PokemonHeader } from './PokemonHeader';
 export { PokemonImage } from './PokemonImage';
 export { PokemonInfoCards } from './PokemonInfoCards';
+export { PokemonListSkeleton } from './PokemonListSkeleton';
 export { PokemonPagination } from './PokemonPagination';
 export { PokemonSearchBar } from './PokemonSearchBar';
 export { PokemonStatsSection } from './PokemonStatsSection';
