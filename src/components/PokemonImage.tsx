@@ -8,10 +8,14 @@ interface PokemonImageProps {
 }
 
 export const PokemonImage: React.FC<PokemonImageProps> = ({ sprite, name, enableTilt = false }) => {
-  const shouldTilt = enableTilt;
   const { classes } = useStyles();
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const [tiltStyle, setTiltStyle] = useState<React.CSSProperties>({});
+
+  // Respect reduced motion preference
+  const prefersReducedMotion =
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const shouldTilt = enableTilt && !prefersReducedMotion;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!shouldTilt || !imageContainerRef.current) return;
@@ -45,6 +49,7 @@ export const PokemonImage: React.FC<PokemonImageProps> = ({ sprite, name, enable
       onMouseMove={shouldTilt ? handleMouseMove : undefined}
       onMouseLeave={shouldTilt ? handleMouseLeave : undefined}
       style={shouldTilt ? tiltStyle : undefined}
+      aria-hidden={shouldTilt ? 'true' : undefined}
     >
       {sprite ? (
         <img
@@ -52,6 +57,7 @@ export const PokemonImage: React.FC<PokemonImageProps> = ({ sprite, name, enable
           alt={name}
           className={classes.image}
           loading="lazy"
+          decoding="async"
           width={180}
           height={180}
         />

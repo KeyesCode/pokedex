@@ -3,14 +3,14 @@ import { Skeleton } from 'antd';
 import { tss } from '../tss';
 
 interface PokemonListSkeletonProps {
-  count: number;
+  count?: number;
 }
 
 export const PokemonListSkeleton: React.FC<PokemonListSkeletonProps> = ({ count = 20 }) => {
   const { classes } = useStyles();
 
   const skeletonCards = Array.from({ length: count }, (_, i) => (
-    <li key={`skeleton-${i}`}>
+    <li key={`skeleton-${i}`} aria-hidden="true">
       <div className={classes.skeletonCard}>
         <Skeleton.Image active className={classes.skeletonImage} />
         <div className={classes.skeletonContent}>

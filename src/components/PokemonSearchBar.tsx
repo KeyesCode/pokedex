@@ -14,13 +14,13 @@ export const PokemonSearchBar: React.FC<PokemonSearchBarProps> = ({
   onChange,
   placeholder = 'Search Pokémon by name, number, or type...',
 }) => {
-  const searchPlaceholder = placeholder;
   const { classes } = useStyles();
 
   return (
     <div className={classes.searchContainer}>
       <Input
-        placeholder={searchPlaceholder}
+        aria-label="Search Pokémon"
+        placeholder={placeholder}
         prefix={<SearchOutlined />}
         value={value}
         onChange={(e) => onChange(e.target.value)}

@@ -6,7 +6,12 @@ export const PokemonDetailSkeleton: React.FC = () => {
   const { classes } = useStyles();
 
   return (
-    <div className={classes.content}>
+    <div
+      className={classes.content}
+      role="status"
+      aria-live="polite"
+      aria-label="Loading Pokémon details"
+    >
       <div className={classes.header}>
         <div className={classes.skeletonImageContainer}>
           <Skeleton.Image active className={classes.skeletonImage} />

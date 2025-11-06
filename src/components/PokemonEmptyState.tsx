@@ -4,14 +4,19 @@ import { tss } from '../tss';
 
 interface PokemonEmptyStateProps {
   searchTerm: string;
+  // eslint-disable-next-line react/require-default-props
+  onClear?: () => void;
 }
 
-export const PokemonEmptyState: React.FC<PokemonEmptyStateProps> = ({ searchTerm = '' }) => {
+export const PokemonEmptyState: React.FC<PokemonEmptyStateProps> = ({
+  searchTerm = '',
+  onClear,
+}) => {
   const { classes } = useStyles();
   const hasSearchTerm = searchTerm.trim().length > 0;
 
   return (
-    <div className={classes.emptyContainer}>
+    <div className={classes.emptyContainer} role="status" aria-live="polite">
       <div className={classes.emptyContent}>
         <div className={classes.emptyIcon}>
           <SearchOutlined />
@@ -31,6 +36,11 @@ export const PokemonEmptyState: React.FC<PokemonEmptyStateProps> = ({ searchTerm
             'Start searching to find Pokémon!'
           )}
         </p>
+        {hasSearchTerm && onClear && (
+          <button type="button" onClick={onClear} className={classes.clearButton}>
+            Clear search
+          </button>
+        )}
       </div>
     </div>
   );
@@ -78,5 +88,29 @@ const useStyles = tss.create(({ theme }) => ({
   searchTerm: {
     color: '#4a90e2',
     fontWeight: 600,
+  },
+  clearButton: {
+    marginTop: '16px',
+    padding: '8px 16px',
+    backgroundColor: '#4a90e2',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '14px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    '&:hover': {
+      backgroundColor: '#5aa0f2',
+      transform: 'translateY(-1px)',
+      boxShadow: '0 2px 8px rgba(74, 144, 226, 0.3)',
+    },
+    '&:active': {
+      transform: 'translateY(0)',
+    },
+    '&:focus': {
+      outline: '2px solid #4a90e2',
+      outlineOffset: '2px',
+    },
   },
 }));

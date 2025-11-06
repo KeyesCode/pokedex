@@ -68,5 +68,6 @@ const useStyles = tss.create(({ theme }) => ({
     gap: '8px',
     flexWrap: 'wrap',
     justifyContent: 'center',
+    overflowWrap: 'anywhere',
   },
 }));

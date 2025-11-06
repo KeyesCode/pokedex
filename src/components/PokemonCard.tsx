@@ -8,9 +8,16 @@ interface PokemonCardProps {
   onClick: (pokemon: Pokemon) => void;
   // eslint-disable-next-line react/require-default-props
   onMouseEnter?: () => void;
+  // eslint-disable-next-line react/require-default-props
+  onFocus?: () => void;
 }
 
-export const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon, onClick, onMouseEnter }) => {
+export const PokemonCard: React.FC<PokemonCardProps> = ({
+  pokemon,
+  onClick,
+  onMouseEnter = () => {},
+  onFocus = () => {},
+}) => {
   const { classes } = useStyles();
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -25,8 +32,10 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon, onClick, onMo
       <button
         type="button"
         className={classes.listItem}
+        aria-label={`View details for ${pokemon.name}`}
         onClick={() => onClick(pokemon)}
         onMouseEnter={onMouseEnter}
+        onFocus={onFocus}
         onKeyDown={handleKeyDown}
         tabIndex={0}
       >

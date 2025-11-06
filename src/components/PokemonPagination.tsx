@@ -16,6 +16,12 @@ export const PokemonPagination: React.FC<PokemonPaginationProps> = ({
   onChange,
 }) => {
   const { classes } = useStyles();
+
+  // Guard against invalid page size
+  if (pageSize === 0) {
+    return null;
+  }
+
   const totalPages = Math.ceil(total / pageSize);
 
   const handlePageChange = (page: number) => {
@@ -27,6 +33,10 @@ export const PokemonPagination: React.FC<PokemonPaginationProps> = ({
   if (totalPages <= 1) {
     return null;
   }
+
+  // Calculate range for display
+  const start = (currentPage - 1) * pageSize + 1;
+  const end = Math.min(currentPage * pageSize, total);
 
   return (
     <div className={classes.paginationContainer}>
@@ -43,16 +53,9 @@ export const PokemonPagination: React.FC<PokemonPaginationProps> = ({
           />
         </div>
         <div className={classes.paginationTotal}>
-          <Pagination
-            current={currentPage}
-            total={total}
-            pageSize={pageSize}
-            onChange={handlePageChange}
-            showSizeChanger={false}
-            showQuickJumper={false}
-            showTotal={(totalCount, range) => `${range[0]}-${range[1]} of ${totalCount} Pokémon`}
-            className={classes.paginationTotalOnly}
-          />
+          <span className={classes.paginationTotalText}>
+            {start}-{end} of {total} Pokémon
+          </span>
         </div>
       </div>
     </div>
@@ -87,6 +90,14 @@ const useStyles = tss.create(({ theme }) => ({
   paginationTotal: {
     display: 'flex',
     justifyContent: 'center',
+  },
+  paginationTotalText: {
+    color: theme.color.text.primary,
+    fontSize: '14px',
+    fontWeight: 500,
+    '@media (max-width: 480px)': {
+      fontSize: '12px',
+    },
   },
   pagination: {
     '@media (max-width: 768px)': {
@@ -198,9 +209,6 @@ const useStyles = tss.create(({ theme }) => ({
     '& .ant-pagination-item-ellipsis': {
       color: '#888',
     },
-    '& .ant-pagination-total-text': {
-      display: 'none',
-    },
     '& .ant-pagination-options': {
       '& .ant-pagination-options-quick-jumper': {
         color: theme.color.text.primary,
@@ -271,28 +279,8 @@ const useStyles = tss.create(({ theme }) => ({
         },
       },
     },
-  },
-  paginationTotalOnly: {
-    '& .ant-pagination-item': {
-      display: 'none',
-    },
-    '& .ant-pagination-prev, & .ant-pagination-next': {
-      display: 'none',
-    },
-    '& .ant-pagination-jump-prev, & .ant-pagination-jump-next': {
-      display: 'none',
-    },
-    '& .ant-pagination-options': {
-      display: 'none',
-    },
     '& .ant-pagination-total-text': {
-      display: 'block',
-      color: theme.color.text.primary,
-      fontSize: '14px',
-      fontWeight: 500,
-      '@media (max-width: 480px)': {
-        fontSize: '12px',
-      },
+      display: 'none',
     },
   },
 }));

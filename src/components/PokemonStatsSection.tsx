@@ -15,24 +15,34 @@ export const PokemonStatsSection: React.FC<PokemonStatsSectionProps> = ({ stats 
 
   if (stats.length === 0) return null;
 
+  // Derive max stat from data for dynamic scaling
+  const maxStat = Math.max(...stats.map((s) => s.baseStat), 150);
+
   return (
     <div className={classes.statsSection}>
       <h3 className={classes.statsTitle}>Base Stats</h3>
       <div className={classes.statsGrid}>
-        {stats.map((stat) => (
-          <div key={stat.name} className={classes.statCard}>
-            <div className={classes.statLabel}>
-              {stat.name.charAt(0).toUpperCase() + stat.name.slice(1).replace('-', ' ')}
-            </div>
-            <div className={classes.statValue}>{stat.baseStat}</div>
-            <div className={classes.statBar}>
+        {stats.map((stat) => {
+          const percentage = Math.min((stat.baseStat / maxStat) * 100, 100);
+          return (
+            <div key={stat.name} className={classes.statCard}>
+              <div className={classes.statLabel}>
+                {stat.name.charAt(0).toUpperCase() + stat.name.slice(1).replace('-', ' ')}
+              </div>
+              <div className={classes.statValue}>{stat.baseStat}</div>
               <div
-                className={classes.statBarFill}
-                style={{ width: `${Math.min((stat.baseStat / 150) * 100, 100)}%` }}
-              />
+                className={classes.statBar}
+                role="progressbar"
+                aria-valuenow={stat.baseStat}
+                aria-valuemin={0}
+                aria-valuemax={maxStat}
+                aria-label={`${stat.name} stat: ${stat.baseStat} out of ${maxStat}`}
+              >
+                <div className={classes.statBarFill} style={{ width: `${percentage}%` }} />
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

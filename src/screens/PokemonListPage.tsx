@@ -132,6 +132,7 @@ export const PokemonListPage = () => {
                 pokemon={pokemon}
                 onClick={handlePokemonClick}
                 onMouseEnter={() => handlePokemonHover(pokemon)}
+                onFocus={() => handlePokemonHover(pokemon)}
               />
             ))}
           </ul>
