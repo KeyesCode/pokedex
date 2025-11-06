@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { tss } from '../tss';
 import { PokemonTypeBadge } from './PokemonTypeBadge';
 import { Pokemon } from 'src/hooks/useGetPokemons';
@@ -19,6 +19,38 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
   onFocus = () => {},
 }) => {
   const { classes } = useStyles();
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+  const [tiltStyle, setTiltStyle] = useState<React.CSSProperties>({});
+
+  // Respect reduced motion preference
+  const prefersReducedMotion =
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const shouldTilt = !prefersReducedMotion;
+
+  const handleImageMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!shouldTilt || !imageContainerRef.current) return;
+
+    const rect = imageContainerRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    const mouseX = e.clientX - centerX;
+    const mouseY = e.clientY - centerY;
+
+    const rotateX = (mouseY / rect.height) * -20;
+    const rotateY = (mouseX / rect.width) * 20;
+
+    setTiltStyle({
+      transform: `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`,
+    });
+  };
+
+  const handleImageMouseLeave = () => {
+    if (!shouldTilt) return;
+    setTiltStyle({
+      transform: 'perspective(600px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
+    });
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -39,7 +71,14 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
         onKeyDown={handleKeyDown}
         tabIndex={0}
       >
-        <div className={classes.imageContainer}>
+        <div
+          ref={shouldTilt ? imageContainerRef : null}
+          className={classes.imageContainer}
+          onMouseMove={shouldTilt ? handleImageMouseMove : undefined}
+          onMouseLeave={shouldTilt ? handleImageMouseLeave : undefined}
+          style={shouldTilt ? tiltStyle : undefined}
+          aria-hidden={shouldTilt ? 'true' : undefined}
+        >
           {pokemon.sprite ? (
             <img
               src={pokemon.sprite}
@@ -108,6 +147,7 @@ const useStyles = tss.create(({ theme }) => ({
     justifyContent: 'center',
     backgroundColor: '#0f0f1e',
     borderRadius: '8px',
+    transition: 'transform 0.1s ease-out',
     '@media (max-width: 480px)': {
       width: '60px',
       height: '60px',
