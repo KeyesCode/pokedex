@@ -4,7 +4,6 @@ import { tss } from '../tss';
 
 interface PokemonEmptyStateProps {
   searchTerm: string;
-  // eslint-disable-next-line react/require-default-props
   onClear?: () => void;
 }
 

@@ -18,6 +18,7 @@
   "plugins": ["prettier"],
   "rules": {
     "react/function-component-definition": "off",
+    "react/require-default-props": "off",
     "@typescript-eslint/indent": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],

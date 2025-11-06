@@ -4,7 +4,6 @@ import { tss } from '../tss';
 interface PokemonTypeBadgeProps {
   type: string;
   size: 'small' | 'medium' | 'large';
-  // eslint-disable-next-line react/require-default-props
   onClick?: (type: string) => void;
 }
 

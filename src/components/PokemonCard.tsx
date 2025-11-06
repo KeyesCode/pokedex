@@ -6,11 +6,8 @@ import { Pokemon } from 'src/hooks/useGetPokemons';
 interface PokemonCardProps {
   pokemon: Pokemon;
   onClick: (pokemon: Pokemon) => void;
-  // eslint-disable-next-line react/require-default-props
   onMouseEnter?: () => void;
-  // eslint-disable-next-line react/require-default-props
   onFocus?: () => void;
-  // eslint-disable-next-line react/require-default-props
   onTypeClick?: (type: string) => void;
 }
 
