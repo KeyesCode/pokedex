@@ -63,6 +63,15 @@ export const PokemonDetailModal = () => {
         />
       )}
 
+      {!loading && !error && !data && (
+        <Alert
+          message="Pokémon Not Found"
+          description="The Pokémon you're looking for doesn't exist or the ID is invalid."
+          type="warning"
+          showIcon
+        />
+      )}
+
       {!loading && !error && data && (
         <div className={classes.content}>
           <div className={classes.header}>

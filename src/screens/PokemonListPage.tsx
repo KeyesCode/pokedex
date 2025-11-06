@@ -68,7 +68,7 @@ export const PokemonListPage = () => {
     setSearchParams(params);
   };
 
-  const displayData = hasSearch ? filteredData : data;
+  const displayData = hasSearch ? filteredData : data ?? [];
   const paginatedData = hasSearch
     ? filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
     : displayData;
