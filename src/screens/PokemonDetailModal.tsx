@@ -39,6 +39,7 @@ export const PokemonDetailModal = () => {
       onCancel={handleClose}
       footer={null}
       width={800}
+      centered
       className={classes.modal}
       styles={{
         body: {

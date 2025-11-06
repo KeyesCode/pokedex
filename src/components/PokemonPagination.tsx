@@ -205,6 +205,10 @@ const useStyles = tss.create(({ theme }) => ({
           color: '#4a90e2',
         },
       },
+      '& .ant-pagination-item-container .ant-pagination-item-link-icon': {
+        color: theme.color.text.primary,
+        opacity: 0.7,
+      },
     },
     '& .ant-pagination-item-ellipsis': {
       color: '#888',
