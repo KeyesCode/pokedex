@@ -1,10 +1,16 @@
 import React from 'react';
-import { act, render, screen } from 'src/test-utils';
+import { act, render, screen, waitFor } from 'src/test-utils';
 import { MemoryRouter, useNavigate } from 'react-router-dom';
 import { PokemonListPage } from './PokemonListPage';
 import { useGetPokemons } from 'src/hooks/useGetPokemons';
 
 jest.mock('src/hooks/useGetPokemons');
+jest.mock('@apollo/client/react', () => ({
+  ...jest.requireActual('@apollo/client/react'),
+  useApolloClient: jest.fn(() => ({
+    query: jest.fn(() => Promise.resolve({ data: {} })),
+  })),
+}));
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: jest.fn(),
@@ -69,20 +75,30 @@ describe('PokemonListPage', () => {
       await user.type(searchInput, 'pika');
     });
 
-    // Pikachu should still be visible, others should not
-    expect(screen.getByText('Pikachu')).toBeInTheDocument();
-    expect(queryByText('Bulbasaur')).not.toBeInTheDocument();
-    expect(queryByText('Ivysaur')).not.toBeInTheDocument();
+    // Wait for debounced search to complete (250ms + buffer)
+    await waitFor(
+      () => {
+        expect(screen.getByText('Pikachu')).toBeInTheDocument();
+        expect(queryByText('Bulbasaur')).not.toBeInTheDocument();
+        expect(queryByText('Ivysaur')).not.toBeInTheDocument();
+      },
+      { timeout: 500 },
+    );
 
     // Clear search
     await act(async () => {
       await user.clear(searchInput);
     });
 
-    // All should be visible again
-    expect(screen.getByText('Bulbasaur')).toBeInTheDocument();
-    expect(screen.getByText('Ivysaur')).toBeInTheDocument();
-    expect(screen.getByText('Pikachu')).toBeInTheDocument();
+    // Wait for debounced search to complete
+    await waitFor(
+      () => {
+        expect(screen.getByText('Bulbasaur')).toBeInTheDocument();
+        expect(screen.getByText('Ivysaur')).toBeInTheDocument();
+        expect(screen.getByText('Pikachu')).toBeInTheDocument();
+      },
+      { timeout: 500 },
+    );
   });
 
   test('search is case insensitive', async () => {
@@ -99,8 +115,14 @@ describe('PokemonListPage', () => {
       await user.type(searchInput, 'BULBASAUR');
     });
 
-    expect(screen.getByText('Bulbasaur')).toBeInTheDocument();
-    expect(queryByText('Pikachu')).not.toBeInTheDocument();
+    // Wait for debounced search to complete
+    await waitFor(
+      () => {
+        expect(screen.getByText('Bulbasaur')).toBeInTheDocument();
+        expect(queryByText('Pikachu')).not.toBeInTheDocument();
+      },
+      { timeout: 500 },
+    );
 
     // Clear and search with mixed case
     await act(async () => {
@@ -108,8 +130,14 @@ describe('PokemonListPage', () => {
       await user.type(searchInput, 'PiKaChU');
     });
 
-    expect(screen.getByText('Pikachu')).toBeInTheDocument();
-    expect(queryByText('Bulbasaur')).not.toBeInTheDocument();
+    // Wait for debounced search to complete
+    await waitFor(
+      () => {
+        expect(screen.getByText('Pikachu')).toBeInTheDocument();
+        expect(queryByText('Bulbasaur')).not.toBeInTheDocument();
+      },
+      { timeout: 500 },
+    );
   });
 
   test('search by type is case insensitive', async () => {
@@ -126,10 +154,16 @@ describe('PokemonListPage', () => {
       await user.type(searchInput, 'GRASS');
     });
 
+    // Wait for debounced search to complete
     // Should find both Bulbasaur and Ivysaur (both have grass type)
-    expect(screen.getByText('Bulbasaur')).toBeInTheDocument();
-    expect(screen.getByText('Ivysaur')).toBeInTheDocument();
-    expect(queryByText('Pikachu')).not.toBeInTheDocument();
+    await waitFor(
+      () => {
+        expect(screen.getByText('Bulbasaur')).toBeInTheDocument();
+        expect(screen.getByText('Ivysaur')).toBeInTheDocument();
+        expect(queryByText('Pikachu')).not.toBeInTheDocument();
+      },
+      { timeout: 500 },
+    );
   });
 
   test('search by number works', async () => {
@@ -146,7 +180,13 @@ describe('PokemonListPage', () => {
       await user.type(searchInput, '25');
     });
 
-    expect(screen.getByText('Pikachu')).toBeInTheDocument();
-    expect(queryByText('Bulbasaur')).not.toBeInTheDocument();
+    // Wait for debounced search to complete
+    await waitFor(
+      () => {
+        expect(screen.getByText('Pikachu')).toBeInTheDocument();
+        expect(queryByText('Bulbasaur')).not.toBeInTheDocument();
+      },
+      { timeout: 500 },
+    );
   });
 });

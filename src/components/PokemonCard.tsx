@@ -6,17 +6,40 @@ import { Pokemon } from 'src/hooks/useGetPokemons';
 interface PokemonCardProps {
   pokemon: Pokemon;
   onClick: (pokemon: Pokemon) => void;
+  // eslint-disable-next-line react/require-default-props
+  onMouseEnter?: () => void;
 }
 
-export const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon, onClick }) => {
+export const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon, onClick, onMouseEnter }) => {
   const { classes } = useStyles();
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onClick(pokemon);
+    }
+  };
 
   return (
     <li>
-      <button type="button" className={classes.listItem} onClick={() => onClick(pokemon)}>
+      <button
+        type="button"
+        className={classes.listItem}
+        onClick={() => onClick(pokemon)}
+        onMouseEnter={onMouseEnter}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+      >
         <div className={classes.imageContainer}>
           {pokemon.sprite ? (
-            <img src={pokemon.sprite} alt={pokemon.name} className={classes.image} />
+            <img
+              src={pokemon.sprite}
+              alt={pokemon.name}
+              className={classes.image}
+              loading="lazy"
+              width={80}
+              height={80}
+            />
           ) : (
             <div className={classes.imagePlaceholder}>No Image</div>
           )}

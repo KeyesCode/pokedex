@@ -47,7 +47,14 @@ export const PokemonImage: React.FC<PokemonImageProps> = ({ sprite, name, enable
       style={shouldTilt ? tiltStyle : undefined}
     >
       {sprite ? (
-        <img src={sprite} alt={name} className={classes.image} />
+        <img
+          src={sprite}
+          alt={name}
+          className={classes.image}
+          loading="lazy"
+          width={180}
+          height={180}
+        />
       ) : (
         <div className={classes.imagePlaceholder}>No Image</div>
       )}
