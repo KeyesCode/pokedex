@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { tss } from '../tss';
 import { useGetPokemons, Pokemon, GET_POKEMON_DETAILS } from 'src/hooks/useGetPokemons';
@@ -33,15 +33,23 @@ export const PokemonListPage = () => {
   // Sync URL only when debounced changes (reduces history spam)
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
-    if (debouncedSearch) {
+    const prevSearch = params.get('search') ?? '';
+
+    if (debouncedSearch.trim()) {
+      const needsSearchUpdate = prevSearch !== debouncedSearch;
+
+      if (!needsSearchUpdate) return;
+
       params.set('search', debouncedSearch);
-      if (params.get('page') !== '1') params.set('page', '1');
+      // Only reset page to 1 when search term actually changes
+      params.set('page', '1');
     } else {
+      if (!prevSearch) return; // nothing to remove
       params.delete('search');
     }
+
     setSearchParams(params, { replace: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch]);
+  }, [debouncedSearch, searchParams, setSearchParams]);
 
   // When searching or filtering by type, fetch all data for client-side filtering
   // When not searching/filtering, use pagination
@@ -79,52 +87,68 @@ export const PokemonListPage = () => {
     return result;
   }, [data, debouncedSearch, typeFilter]);
 
-  const handlePokemonClick = (pokemon: Pokemon) => {
-    // Preserve pagination state in URL when navigating to detail
-    const params = new URLSearchParams(searchParams);
-    const queryString = params.toString();
-    const url = queryString ? `/pokemon/${pokemon.id}?${queryString}` : `/pokemon/${pokemon.id}`;
-    navigate(url);
-  };
+  const handlePokemonClick = useCallback(
+    (pokemon: Pokemon) => {
+      // Preserve pagination state in URL when navigating to detail
+      const params = new URLSearchParams(searchParams);
+      const queryString = params.toString();
+      const url = queryString ? `/pokemon/${pokemon.id}?${queryString}` : `/pokemon/${pokemon.id}`;
+      navigate(url);
+    },
+    [navigate, searchParams],
+  );
 
-  const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams);
-    params.set('page', page.toString());
-    setSearchParams(params, { replace: true });
-  };
+  const handlePageChange = useCallback(
+    (page: number) => {
+      const params = new URLSearchParams(searchParams);
+      params.set('page', page.toString());
+      setSearchParams(params, { replace: true });
+    },
+    [searchParams, setSearchParams],
+  );
 
   // Input handler is now trivial
-  const onSearchChange = (value: string) => setInputValue(value);
+  const onSearchChange = useCallback((value: string) => setInputValue(value), []);
 
   // Handle type badge click to filter by type
-  const handleTypeClick = (type: string) => {
-    const params = new URLSearchParams(searchParams);
-    if (typeFilter.toLowerCase() === type.toLowerCase()) {
-      // If clicking the same type, remove the filter
-      params.delete('type');
-    } else {
-      // Set the new type filter
-      params.set('type', type.toLowerCase());
-    }
-    // Reset to page 1 when changing type filter
-    params.set('page', '1');
-    setSearchParams(params, { replace: true });
-  };
+  const handleTypeClick = useCallback(
+    (type: string) => {
+      const params = new URLSearchParams(searchParams);
+      if ((searchParams.get('type') || '').toLowerCase() === type.toLowerCase()) {
+        params.delete('type');
+      } else {
+        params.set('type', type.toLowerCase());
+      }
+      params.set('page', '1');
+      setSearchParams(params, { replace: true });
+    },
+    [searchParams, setSearchParams],
+  );
 
   // Prefetch on hover: no optional chain needed
-  const handlePokemonHover = (pokemon: Pokemon) => {
-    const idInt = parseInt(pokemon.id, 10);
-    if (!Number.isNaN(idInt)) {
-      client
-        .query({
-          query: GET_POKEMON_DETAILS,
-          variables: { id: idInt },
-        })
-        .catch(() => {
-          // Silently fail - prefetch is optional
-        });
-    }
-  };
+  const handlePokemonHover = useCallback(
+    (pokemon: Pokemon) => {
+      const idInt = parseInt(pokemon.id, 10);
+      if (!Number.isNaN(idInt)) {
+        client
+          .query({
+            query: GET_POKEMON_DETAILS,
+            variables: { id: idInt },
+          })
+          .catch(() => {
+            // Silently fail - prefetch is optional
+          });
+      }
+    },
+    [client],
+  );
+
+  const handleClearTypeFilter = useCallback(() => {
+    const params = new URLSearchParams(searchParams);
+    params.delete('type');
+    params.set('page', '1');
+    setSearchParams(params, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const displayData = needsAllData ? filteredData : data ?? [];
   const paginatedData = needsAllData
@@ -149,13 +173,6 @@ export const PokemonListPage = () => {
       </div>
     );
   }
-
-  const handleClearTypeFilter = () => {
-    const params = new URLSearchParams(searchParams);
-    params.delete('type');
-    params.set('page', '1');
-    setSearchParams(params, { replace: true });
-  };
 
   return (
     <div className={classes.root}>
