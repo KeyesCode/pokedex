@@ -78,6 +78,7 @@ const useStyles = tss.create(() => ({
     borderRadius: '12px',
     padding: '16px',
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+    overflow: 'hidden',
     '@media (max-width: 768px)': {
       width: '150px',
       height: '150px',
@@ -90,8 +91,24 @@ const useStyles = tss.create(() => ({
     },
   },
   skeletonImage: {
-    width: '100%',
-    height: '100%',
+    width: '100% !important',
+    height: '100% !important',
+    minWidth: '148px !important',
+    minHeight: '148px !important',
+    maxWidth: '148px !important',
+    maxHeight: '148px !important',
+    '@media (max-width: 768px)': {
+      minWidth: '126px !important',
+      minHeight: '126px !important',
+      maxWidth: '126px !important',
+      maxHeight: '126px !important',
+    },
+    '@media (max-width: 480px)': {
+      minWidth: '100px !important',
+      minHeight: '100px !important',
+      maxWidth: '100px !important',
+      maxHeight: '100px !important',
+    },
   },
   skeletonHeader: {
     display: 'flex',
