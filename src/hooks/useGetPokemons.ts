@@ -16,6 +16,8 @@ export interface PokemonDetail extends Pokemon {
   stats: Array<{ name: string; baseStat: number }>;
 }
 
+// For server-side search (senior level), add $search: String parameter and use it in a where clause:
+// query GetPokemons($limit: Int, $offset: Int, $search: String)
 export const GET_POKEMONS = gql`
   query GetPokemons($limit: Int, $offset: Int) {
     pokemon(limit: $limit, offset: $offset, order_by: { id: asc }) {

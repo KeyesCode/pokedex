@@ -53,6 +53,7 @@ export const PokemonListPage = () => {
     if (!debouncedSearch.trim()) return data;
 
     const s = debouncedSearch.toLowerCase();
+    // Client-side filtering for immediate feedback
     return data.filter(
       (pokemon) =>
         pokemon.name.toLowerCase().includes(s) ||
