@@ -53,12 +53,14 @@ export const PokemonListPage = () => {
     const params = new URLSearchParams(searchParams);
     if (searchTerm) {
       params.set('search', searchTerm);
+      // Only reset page to 1 if search term actually changed (not just on any params change)
       if (params.get('page') !== '1') params.set('page', '1');
     } else {
       params.delete('search');
     }
     setSearchParams(params, { replace: true });
-  }, [searchTerm, searchParams, setSearchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm]);
 
   // Initialize searchTerm and inputValue from URL on mount
   useEffect(() => {
