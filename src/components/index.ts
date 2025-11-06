@@ -9,3 +9,4 @@ export { PokemonPagination } from './PokemonPagination';
 export { PokemonSearchBar } from './PokemonSearchBar';
 export { PokemonStatsSection } from './PokemonStatsSection';
 export { PokemonTypeBadge } from './PokemonTypeBadge';
+export { TypeFilterChip } from './TypeFilterChip';

@@ -10,6 +10,8 @@ interface PokemonCardProps {
   onMouseEnter?: () => void;
   // eslint-disable-next-line react/require-default-props
   onFocus?: () => void;
+  // eslint-disable-next-line react/require-default-props
+  onTypeClick?: (type: string) => void;
 }
 
 export const PokemonCard: React.FC<PokemonCardProps> = ({
@@ -17,6 +19,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
   onClick,
   onMouseEnter = () => {},
   onFocus = () => {},
+  onTypeClick,
 }) => {
   const { classes } = useStyles();
   const imageContainerRef = useRef<HTMLDivElement>(null);
@@ -99,7 +102,7 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({
           </div>
           <div className={classes.typesContainer}>
             {pokemon.types.map((type) => (
-              <PokemonTypeBadge key={type} type={type} size="small" />
+              <PokemonTypeBadge key={type} type={type} size="small" onClick={onTypeClick} />
             ))}
           </div>
         </div>

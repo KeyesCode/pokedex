@@ -8,6 +8,7 @@ import { PokemonSearchBar } from '../components/PokemonSearchBar';
 import { PokemonEmptyState } from '../components/PokemonEmptyState';
 import { PokemonPagination } from '../components/PokemonPagination';
 import { PokemonListSkeleton } from '../components/PokemonListSkeleton';
+import { TypeFilterChip } from '../components/TypeFilterChip';
 import { useApolloClient } from '@apollo/client/react';
 
 const PAGE_SIZE = 20;
@@ -20,6 +21,9 @@ export const PokemonListPage = () => {
 
   // Get page from URL, default to 1
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
+
+  // Get type filter from URL
+  const typeFilter = searchParams.get('type') || '';
 
   // Initialize input from URL once on mount
   const initial = searchParams.get('search') ?? '';
@@ -39,28 +43,41 @@ export const PokemonListPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch]);
 
-  // When searching, fetch all data for client-side filtering
-  // When not searching, use pagination
+  // When searching or filtering by type, fetch all data for client-side filtering
+  // When not searching/filtering, use pagination
   const hasSearch = debouncedSearch.trim().length > 0;
+  const hasTypeFilter = typeFilter.length > 0;
+  const needsAllData = hasSearch || hasTypeFilter;
   const { data, loading, error, totalCount } = useGetPokemons(
     currentPage,
     PAGE_SIZE,
-    hasSearch, // fetchAll when searching
+    needsAllData, // fetchAll when searching or filtering by type
   );
 
   const filteredData = useMemo(() => {
     if (!data) return [];
-    if (!debouncedSearch.trim()) return data;
+    let result = data;
 
-    const s = debouncedSearch.toLowerCase();
-    // Client-side filtering for immediate feedback
-    return data.filter(
-      (pokemon) =>
-        pokemon.name.toLowerCase().includes(s) ||
-        pokemon.number.toString().includes(debouncedSearch) ||
-        pokemon.types.some((type) => type.toLowerCase().includes(s)),
-    );
-  }, [data, debouncedSearch]);
+    // Filter by type if type filter is set
+    if (typeFilter) {
+      result = result.filter((pokemon) =>
+        pokemon.types.some((type) => type.toLowerCase() === typeFilter.toLowerCase()),
+      );
+    }
+
+    // Filter by search term if search is set
+    if (debouncedSearch.trim()) {
+      const s = debouncedSearch.toLowerCase();
+      result = result.filter(
+        (pokemon) =>
+          pokemon.name.toLowerCase().includes(s) ||
+          pokemon.number.toString().includes(debouncedSearch) ||
+          pokemon.types.some((type) => type.toLowerCase().includes(s)),
+      );
+    }
+
+    return result;
+  }, [data, debouncedSearch, typeFilter]);
 
   const handlePokemonClick = (pokemon: Pokemon) => {
     // Preserve pagination state in URL when navigating to detail
@@ -79,6 +96,21 @@ export const PokemonListPage = () => {
   // Input handler is now trivial
   const onSearchChange = (value: string) => setInputValue(value);
 
+  // Handle type badge click to filter by type
+  const handleTypeClick = (type: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (typeFilter.toLowerCase() === type.toLowerCase()) {
+      // If clicking the same type, remove the filter
+      params.delete('type');
+    } else {
+      // Set the new type filter
+      params.set('type', type.toLowerCase());
+    }
+    // Reset to page 1 when changing type filter
+    params.set('page', '1');
+    setSearchParams(params, { replace: true });
+  };
+
   // Prefetch on hover: no optional chain needed
   const handlePokemonHover = (pokemon: Pokemon) => {
     const idInt = parseInt(pokemon.id, 10);
@@ -94,11 +126,11 @@ export const PokemonListPage = () => {
     }
   };
 
-  const displayData = hasSearch ? filteredData : data ?? [];
-  const paginatedData = hasSearch
+  const displayData = needsAllData ? filteredData : data ?? [];
+  const paginatedData = needsAllData
     ? filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
     : displayData;
-  const paginationTotal = hasSearch ? filteredData.length : totalCount;
+  const paginationTotal = needsAllData ? filteredData.length : totalCount;
 
   if (error) {
     return (
@@ -110,20 +142,32 @@ export const PokemonListPage = () => {
     );
   }
 
+  const handleClearTypeFilter = () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete('type');
+    params.set('page', '1');
+    setSearchParams(params, { replace: true });
+  };
+
   return (
     <div className={classes.root}>
-      <PokemonSearchBar
-        value={inputValue}
-        onChange={onSearchChange}
-        placeholder="Search Pokémon by name, number, or type..."
-      />
+      <div className={classes.searchSection}>
+        <PokemonSearchBar
+          value={inputValue}
+          onChange={onSearchChange}
+          placeholder="Search Pokémon by name, number, or type..."
+        />
+        {typeFilter && <TypeFilterChip type={typeFilter} onClose={handleClearTypeFilter} />}
+      </div>
 
       {loading && (
         <ul className={classes.list}>
           <PokemonListSkeleton count={PAGE_SIZE} />
         </ul>
       )}
-      {!loading && displayData.length === 0 && <PokemonEmptyState searchTerm={debouncedSearch} />}
+      {!loading && displayData.length === 0 && (
+        <PokemonEmptyState searchTerm={typeFilter ? `type: ${typeFilter}` : debouncedSearch} />
+      )}
       {!loading && displayData.length > 0 && (
         <>
           <ul className={classes.list}>
@@ -134,6 +178,7 @@ export const PokemonListPage = () => {
                 onClick={handlePokemonClick}
                 onMouseEnter={() => handlePokemonHover(pokemon)}
                 onFocus={() => handlePokemonHover(pokemon)}
+                onTypeClick={handleTypeClick}
               />
             ))}
           </ul>
@@ -159,6 +204,21 @@ const useStyles = tss.create(({ theme }) => ({
     },
     '@media (max-width: 480px)': {
       padding: '12px',
+    },
+  },
+  searchSection: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '12px',
+    marginBottom: '24px',
+    flexWrap: 'wrap',
+    '@media (max-width: 768px)': {
+      marginBottom: '20px',
+      gap: '10px',
+    },
+    '@media (max-width: 480px)': {
+      marginBottom: '16px',
+      gap: '8px',
     },
   },
   errorContainer: {
