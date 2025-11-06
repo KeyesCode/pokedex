@@ -31,7 +31,7 @@ export const PokemonSearchBar: React.FC<PokemonSearchBarProps> = ({
   );
 };
 
-const useStyles = tss.create(() => ({
+const useStyles = tss.create(({ theme }) => ({
   searchContainer: {
     marginBottom: '24px',
     maxWidth: '500px',
@@ -44,21 +44,35 @@ const useStyles = tss.create(() => ({
     },
   },
   searchInput: {
-    backgroundColor: '#ffffff',
-    color: '#000000',
+    backgroundColor: '#1a1a2e',
+    color: theme.color.text.primary,
     transition: 'all 0.2s ease',
-    border: '1px solid #d9d9d9',
+    border: '1px solid #2a2a4e',
     '& input': {
-      backgroundColor: '#ffffff',
-      color: '#000000',
+      backgroundColor: '#1a1a2e',
+      color: theme.color.text.primary,
       transition: 'all 0.2s ease',
+      '&::placeholder': {
+        color: '#888',
+      },
     },
     '& .ant-input-prefix': {
-      color: '#000000',
+      color: '#888',
     },
     '&:focus-within': {
       borderColor: '#4a90e2',
       boxShadow: '0 0 0 2px rgba(74, 144, 226, 0.2)',
+      backgroundColor: '#1f1f35',
+      '& input': {
+        backgroundColor: '#1f1f35',
+      },
+    },
+    '&:hover': {
+      borderColor: '#3a3a5e',
+      backgroundColor: '#1f1f35',
+      '& input': {
+        backgroundColor: '#1f1f35',
+      },
     },
   },
 }));
