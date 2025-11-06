@@ -42,6 +42,15 @@ const useStyles = tss
         color: theme.color.text.primary,
         textTransform: 'capitalize',
         border: '1px solid #3a3a5e',
+        transition: 'all 0.2s ease',
+        cursor: 'pointer',
+        display: 'inline-block',
+        '&:hover': {
+          borderColor: '#4a90e2',
+          backgroundColor: '#3a3a6e',
+          transform: 'translateY(-2px)',
+          boxShadow: '0 4px 8px rgba(74, 144, 226, 0.3)',
+        },
       },
     };
   });
