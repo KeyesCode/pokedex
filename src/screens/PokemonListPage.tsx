@@ -1,11 +1,12 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Spin, Pagination } from 'antd';
+import { Spin } from 'antd';
 import { tss } from '../tss';
 import { useGetPokemons, Pokemon } from 'src/hooks/useGetPokemons';
 import { PokemonCard } from '../components/PokemonCard';
 import { PokemonSearchBar } from '../components/PokemonSearchBar';
 import { PokemonEmptyState } from '../components/PokemonEmptyState';
+import { PokemonPagination } from '../components/PokemonPagination';
 
 const PAGE_SIZE = 20;
 
@@ -65,17 +66,13 @@ export const PokemonListPage = () => {
     const params = new URLSearchParams(searchParams);
     params.set('page', page.toString());
     setSearchParams(params);
-    // Scroll to top when page changes
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const displayData = hasSearch ? filteredData : data;
-  const totalPages = hasSearch
-    ? Math.ceil(filteredData.length / PAGE_SIZE)
-    : Math.ceil(totalCount / PAGE_SIZE);
   const paginatedData = hasSearch
     ? filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
     : displayData;
+  const paginationTotal = hasSearch ? filteredData.length : totalCount;
 
   if (loading) {
     return (
@@ -114,35 +111,12 @@ export const PokemonListPage = () => {
               <PokemonCard key={pokemon.id} pokemon={pokemon} onClick={handlePokemonClick} />
             ))}
           </ul>
-          {totalPages > 1 && (
-            <div className={classes.paginationContainer}>
-              <div className={classes.paginationWrapper}>
-                <div className={classes.paginationPages}>
-                  <Pagination
-                    current={currentPage}
-                    total={hasSearch ? filteredData.length : totalCount}
-                    pageSize={PAGE_SIZE}
-                    onChange={handlePageChange}
-                    showSizeChanger={false}
-                    showQuickJumper={false}
-                    className={classes.pagination}
-                  />
-                </div>
-                <div className={classes.paginationTotal}>
-                  <Pagination
-                    current={currentPage}
-                    total={hasSearch ? filteredData.length : totalCount}
-                    pageSize={PAGE_SIZE}
-                    onChange={handlePageChange}
-                    showSizeChanger={false}
-                    showQuickJumper={false}
-                    showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} Pokémon`}
-                    className={classes.paginationTotalOnly}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
+          <PokemonPagination
+            currentPage={currentPage}
+            total={paginationTotal}
+            pageSize={PAGE_SIZE}
+            onChange={handlePageChange}
+          />
         </>
       )}
     </div>
@@ -190,197 +164,6 @@ const useStyles = tss.create(({ theme }) => ({
     '@media (max-width: 480px)': {
       gap: '10px',
       marginBottom: '20px',
-    },
-  },
-  paginationContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    marginTop: '32px',
-    padding: '24px 0',
-    '@media (max-width: 768px)': {
-      marginTop: '24px',
-      padding: '16px 0',
-    },
-    '@media (max-width: 480px)': {
-      marginTop: '20px',
-      padding: '12px 0',
-    },
-  },
-  paginationWrapper: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '16px',
-  },
-  paginationPages: {
-    display: 'flex',
-    justifyContent: 'center',
-  },
-  paginationTotal: {
-    display: 'flex',
-    justifyContent: 'center',
-  },
-  pagination: {
-    '@media (max-width: 768px)': {
-      '& .ant-pagination-item': {
-        minWidth: '32px',
-        height: '32px',
-        lineHeight: '32px',
-        fontSize: '14px',
-      },
-      '& .ant-pagination-prev, & .ant-pagination-next': {
-        minWidth: '32px',
-        height: '32px',
-        '& .ant-pagination-item-link': {
-          minWidth: '32px',
-          height: '32px',
-          lineHeight: '30px',
-        },
-      },
-    },
-    '@media (max-width: 480px)': {
-      '& .ant-pagination-item': {
-        minWidth: '28px',
-        height: '28px',
-        lineHeight: '28px',
-        fontSize: '12px',
-        marginRight: '4px',
-      },
-      '& .ant-pagination-prev, & .ant-pagination-next': {
-        minWidth: '28px',
-        height: '28px',
-        '& .ant-pagination-item-link': {
-          minWidth: '28px',
-          height: '28px',
-          lineHeight: '26px',
-        },
-      },
-      '& .ant-pagination-jump-prev, & .ant-pagination-jump-next': {
-        minWidth: '28px',
-        height: '28px',
-        '& .ant-pagination-item-link': {
-          minWidth: '28px',
-          height: '28px',
-          lineHeight: '26px',
-        },
-      },
-    },
-    '& .ant-pagination-item': {
-      backgroundColor: '#1a1a2e',
-      borderColor: '#2a2a4e',
-      transition: 'all 0.2s ease',
-      '& a': {
-        color: theme.color.text.primary,
-      },
-      '&:hover': {
-        backgroundColor: '#2a2a4e',
-        borderColor: '#4a90e2',
-        '& a': {
-          color: '#4a90e2',
-        },
-      },
-    },
-    '& .ant-pagination-item-active': {
-      backgroundColor: '#4a90e2',
-      borderColor: '#4a90e2',
-      '& a': {
-        color: '#ffffff',
-        fontWeight: 600,
-      },
-      '&:hover': {
-        backgroundColor: '#5aa0f2',
-        borderColor: '#5aa0f2',
-      },
-    },
-    '& .ant-pagination-prev, & .ant-pagination-next': {
-      '& .ant-pagination-item-link': {
-        backgroundColor: '#1a1a2e',
-        borderColor: '#2a2a4e',
-        color: theme.color.text.primary,
-        transition: 'all 0.2s ease',
-        '&:hover': {
-          backgroundColor: '#2a2a4e',
-          borderColor: '#4a90e2',
-          color: '#4a90e2',
-        },
-      },
-      '&.ant-pagination-disabled': {
-        '& .ant-pagination-item-link': {
-          backgroundColor: '#0f0f1e',
-          borderColor: '#1a1a2e',
-          color: '#555',
-          cursor: 'not-allowed',
-          opacity: 0.5,
-        },
-      },
-    },
-    '& .ant-pagination-jump-prev, & .ant-pagination-jump-next': {
-      '& .ant-pagination-item-link': {
-        backgroundColor: '#1a1a2e',
-        borderColor: '#2a2a4e',
-        color: theme.color.text.primary,
-        transition: 'all 0.2s ease',
-        '&:hover': {
-          backgroundColor: '#2a2a4e',
-          borderColor: '#4a90e2',
-          color: '#4a90e2',
-        },
-      },
-    },
-    '& .ant-pagination-item-ellipsis': {
-      color: '#888',
-    },
-    '& .ant-pagination-total-text': {
-      display: 'none',
-    },
-    '& .ant-pagination-options': {
-      '& .ant-pagination-options-quick-jumper': {
-        color: theme.color.text.primary,
-        fontSize: '14px',
-        '& input': {
-          backgroundColor: '#1a1a2e',
-          borderColor: '#2a2a4e',
-          color: theme.color.text.primary,
-          borderRadius: '6px',
-          padding: '4px 8px',
-          fontSize: '14px',
-          transition: 'all 0.2s ease',
-          '&:hover': {
-            borderColor: '#4a90e2',
-          },
-          '&:focus': {
-            borderColor: '#4a90e2',
-            boxShadow: '0 0 0 2px rgba(74, 144, 226, 0.2)',
-            outline: 'none',
-          },
-          '&::placeholder': {
-            color: '#888',
-          },
-        },
-      },
-    },
-  },
-  paginationTotalOnly: {
-    '& .ant-pagination-item': {
-      display: 'none',
-    },
-    '& .ant-pagination-prev, & .ant-pagination-next': {
-      display: 'none',
-    },
-    '& .ant-pagination-jump-prev, & .ant-pagination-jump-next': {
-      display: 'none',
-    },
-    '& .ant-pagination-options': {
-      display: 'none',
-    },
-    '& .ant-pagination-total-text': {
-      display: 'block',
-      color: theme.color.text.primary,
-      fontSize: '14px',
-      fontWeight: 500,
-      '@media (max-width: 480px)': {
-        fontSize: '12px',
-      },
     },
   },
 }));
