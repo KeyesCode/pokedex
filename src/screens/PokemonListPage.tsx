@@ -1,7 +1,8 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { tss } from '../tss';
 import { useGetPokemons, Pokemon, GET_POKEMON_DETAILS } from 'src/hooks/useGetPokemons';
+import { useDebouncedValue } from 'src/hooks/useDebouncedValue';
 import { PokemonCard } from '../components/PokemonCard';
 import { PokemonSearchBar } from '../components/PokemonSearchBar';
 import { PokemonEmptyState } from '../components/PokemonEmptyState';
@@ -17,18 +18,30 @@ export const PokemonListPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const client = useApolloClient();
 
-  // Get search from URL, default to empty
-  const search = searchParams.get('search') ?? '';
-  const [searchTerm, setSearchTerm] = useState(search);
-  const [inputValue, setInputValue] = useState(search); // Local state for immediate input feedback
-  const debounced = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   // Get page from URL, default to 1
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
+  // Initialize input from URL once on mount
+  const initial = searchParams.get('search') ?? '';
+  const [inputValue, setInputValue] = useState(initial);
+  const debouncedSearch = useDebouncedValue(inputValue, 250);
+
+  // Sync URL only when debounced changes (reduces history spam)
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    if (debouncedSearch) {
+      params.set('search', debouncedSearch);
+      if (params.get('page') !== '1') params.set('page', '1');
+    } else {
+      params.delete('search');
+    }
+    setSearchParams(params, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
+
   // When searching, fetch all data for client-side filtering
   // When not searching, use pagination
-  const hasSearch = searchTerm.trim().length > 0;
+  const hasSearch = debouncedSearch.trim().length > 0;
   const { data, loading, error, totalCount } = useGetPokemons(
     currentPage,
     PAGE_SIZE,
@@ -37,49 +50,16 @@ export const PokemonListPage = () => {
 
   const filteredData = useMemo(() => {
     if (!data) return [];
-    if (!searchTerm.trim()) return data;
+    if (!debouncedSearch.trim()) return data;
 
-    const searchLower = searchTerm.toLowerCase();
+    const s = debouncedSearch.toLowerCase();
     return data.filter(
       (pokemon) =>
-        pokemon.name.toLowerCase().includes(searchLower) ||
-        pokemon.number.toString().includes(searchTerm) ||
-        pokemon.types.some((type) => type.toLowerCase().includes(searchLower)),
+        pokemon.name.toLowerCase().includes(s) ||
+        pokemon.number.toString().includes(debouncedSearch) ||
+        pokemon.types.some((type) => type.toLowerCase().includes(s)),
     );
-  }, [data, searchTerm]);
-
-  // Keep URL in sync with search term (and avoid history bloat)
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-    if (searchTerm) {
-      params.set('search', searchTerm);
-      // Only reset page to 1 if search term actually changed (not just on any params change)
-      if (params.get('page') !== '1') params.set('page', '1');
-    } else {
-      params.delete('search');
-    }
-    setSearchParams(params, { replace: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm]);
-
-  // Initialize searchTerm and inputValue from URL on mount
-  useEffect(() => {
-    if (search !== searchTerm) {
-      setSearchTerm(search);
-      setInputValue(search);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
-
-  // Cleanup debounce timeout on unmount
-  useEffect(
-    () => () => {
-      if (debounced.current) {
-        clearTimeout(debounced.current);
-      }
-    },
-    [],
-  );
+  }, [data, debouncedSearch]);
 
   const handlePokemonClick = (pokemon: Pokemon) => {
     // Preserve pagination state in URL when navigating to detail
@@ -95,16 +75,13 @@ export const PokemonListPage = () => {
     setSearchParams(params, { replace: true });
   };
 
-  const onSearchChange = (value: string) => {
-    setInputValue(value); // Update input immediately for responsive UI
-    if (debounced.current) clearTimeout(debounced.current);
-    debounced.current = setTimeout(() => setSearchTerm(value), 250);
-  };
+  // Input handler is now trivial
+  const onSearchChange = (value: string) => setInputValue(value);
 
+  // Prefetch on hover: no optional chain needed
   const handlePokemonHover = (pokemon: Pokemon) => {
-    // Prefetch Pokemon details on hover
     const idInt = parseInt(pokemon.id, 10);
-    if (!Number.isNaN(idInt) && client?.query) {
+    if (!Number.isNaN(idInt)) {
       client
         .query({
           query: GET_POKEMON_DETAILS,
@@ -145,7 +122,7 @@ export const PokemonListPage = () => {
           <PokemonListSkeleton count={PAGE_SIZE} />
         </ul>
       )}
-      {!loading && displayData.length === 0 && <PokemonEmptyState searchTerm={searchTerm} />}
+      {!loading && displayData.length === 0 && <PokemonEmptyState searchTerm={debouncedSearch} />}
       {!loading && displayData.length > 0 && (
         <>
           <ul className={classes.list}>
